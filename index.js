@@ -4,8 +4,8 @@ var nextBtn = document.getElementById('next-btn');
 var prevBtn = document.getElementById('prev-btn');
 
 var tablePaginateClickHandler = function(clickEvent) {
-    var destinationPage = clickEvent.target.destinationPage;
-    requestMonsterList(destinationPage);
+    var monsterListUrl = clickEvent.target.destinationPage;
+    requestMonsterList(monsterListUrl);
 };
 
 nextBtn.addEventListener('click', tablePaginateClickHandler);
