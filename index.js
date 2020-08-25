@@ -1,6 +1,15 @@
 var canvasElement = document.getElementById('myChart');
 var contentHolder = document.getElementById('content-holder');
-var apiURL = 'https://api.open5e.com/monsters/';
+var nextBtn = document.getElementById('next-btn');
+var prevBtn = document.getElementById('prev-btn');
+
+var tablePaginateClickHandler = function(clickEvent) {
+    var destinationPage = clickEvent.target.destinationPage;
+    requestMonsterList(destinationPage);
+};
+
+nextBtn.addEventListener('click', tablePaginateClickHandler);
+prevBtn.addEventListener('click', tablePaginateClickHandler);
 
 var makeMonsterTable = function(monsterTableData) {
     var rows = monsterTableData.results.map(function(monster) {
@@ -30,13 +39,26 @@ var makeMonsterTable = function(monsterTableData) {
     `
 };
 
-var requestData = function() {
-    fetch(apiURL).then(function(response) {
-        response.json().then(function(data) {
-            console.log('requestData: data', data);
-            makeMonsterTable(data);
-        })
-    });
+var requestMonsterList = function(page) {
+    fetch(page)
+        .then(function(response) {
+            response.json().then(function(data) {
+                console.log('requestData: data', data);
+                makeMonsterTable(data);
+                if (data.previous) {
+                    prevBtn.removeAttribute("disabled");
+                    prevBtn.destinationPage = data.previous;
+                } else {
+                    prevBtn.setAttribute("disabled", true);
+                }
+                if (data.next) {
+                    nextBtn.removeAttribute("disabled");
+                    nextBtn.destinationPage = data.next;
+                } else {
+                    nextBtn.setAttribute("disabled", true);
+                }
+            })
+        });
 };
 
-requestData();
+requestMonsterList(`https://api.open5e.com/monsters/`);
