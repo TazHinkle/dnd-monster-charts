@@ -1,18 +1,44 @@
 var canvasElement = document.getElementById('myChart');
 var contentHolder = document.getElementById('content-holder');
-var nextBtn = document.getElementById('next-btn');
-var prevBtn = document.getElementById('prev-btn');
+var monsters = [];
+var monstersPerPage = 100;
 
-var tablePaginateClickHandler = function(clickEvent) {
-    var monsterListUrl = clickEvent.target.destinationPage;
-    requestMonsterList(monsterListUrl);
-};
+var actUponHashParameters = function(urlString) {
+    var hash = urlString.split('#').pop();
+    var params = {};
+    hash.slice(1).split("&").forEach(function(item) {
+        var split = item.split('=');
+        params[split[0]] = split[1];
+    });
+    console.log('window hash change listener', params);
+    if(params.page) {
+        makeMonsterTable(monsters, parseInt(params.page, 10));
+    } else {
+        makeMonsterTable(monsters, 0);
+    }
+}
 
-nextBtn.addEventListener('click', tablePaginateClickHandler);
-prevBtn.addEventListener('click', tablePaginateClickHandler);
+window.addEventListener("hashchange", function(hashChangeEvent) {
+    actUponHashParameters(hashChangeEvent.newURL);
+});
 
-var makeMonsterTable = function(monsterTableData) {
-    var rows = monsterTableData.map(function(monster) {
+var makeMonsterTable = function(monsters, page) {
+    console.log('makeMonsterTable : page', page);
+    var monstersOnThisPage = monsters.slice(
+        monstersPerPage * page,
+        monstersPerPage * (page + 1)
+    );
+    var numberOfPages = Math.ceil(monsters.length / monstersPerPage);
+    var pageLinks = [];
+    for(var i = 0; i < numberOfPages; i++) {
+        var active = i === page ? ' active' : '';
+        pageLinks.push(`
+            <li class="page-item${active}">
+                <a class="page-link" href="#?page=${i}">${i + 1}</a>
+            </li>
+        `);
+    }
+    var rows = monstersOnThisPage.map(function(monster) {
         return `
             <tr>
                 <th scope="row">${monster.name}</th>
@@ -23,6 +49,17 @@ var makeMonsterTable = function(monsterTableData) {
         `
     });
     contentHolder.innerHTML = `
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="#?page=${Math.max((page - 1), 0)}">Prev</a>
+                </li>
+                ${pageLinks.join('')}
+                <li class="page-item">
+                    <a class="page-link" href="#?page=${Math.min((page + 1), (numberOfPages - 1))}">Next</a>
+                </li>
+            </ul>
+        </nav>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -54,5 +91,8 @@ var monsterDataPromise = new Promise(function(resolve) {
             });
     }
 });
-monsterDataPromise.then(makeMonsterTable);
+monsterDataPromise.then(function(data) {
+    monsters = data;
+    actUponHashParameters(window.location.href);
+});
 
