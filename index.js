@@ -11,6 +11,9 @@ var actUponHashParameters = function(urlString) {
         params[split[0]] = split[1];
     });
     console.log('window hash change listener', params);
+    if(params.monster) {
+        alert(`Oh no! It's a ${params.monster}`);
+    } 
     if(params.page) {
         makeMonsterTable(monsters, parseInt(params.page, 10));
     } else {
@@ -41,7 +44,9 @@ var makeMonsterTable = function(monsters, page) {
     var rows = monstersOnThisPage.map(function(monster) {
         return `
             <tr>
-                <th scope="row">${monster.name}</th>
+                <th scope="row">
+                    <a href="#?page=${page}&monster=${monster.slug}">${monster.name}</a>
+                </th>
                 <td>${monster.type}</td>
                 <td>${monster.size}</td>
                 <td>${monster.challenge_rating}</td>
