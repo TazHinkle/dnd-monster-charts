@@ -14,3 +14,4 @@
     - type
     - size
     - challenge_rating
+- Jump to different pages of the monster tables: #page=5

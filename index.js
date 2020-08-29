@@ -12,7 +12,7 @@ nextBtn.addEventListener('click', tablePaginateClickHandler);
 prevBtn.addEventListener('click', tablePaginateClickHandler);
 
 var makeMonsterTable = function(monsterTableData) {
-    var rows = monsterTableData.results.map(function(monster) {
+    var rows = monsterTableData.map(function(monster) {
         return `
             <tr>
                 <th scope="row">${monster.name}</th>
@@ -39,26 +39,20 @@ var makeMonsterTable = function(monsterTableData) {
     `
 };
 
-var requestMonsterList = function(page) {
-    fetch(page)
-        .then(function(response) {
-            response.json().then(function(data) {
-                console.log('requestData: data', data);
-                makeMonsterTable(data);
-                if (data.previous) {
-                    prevBtn.removeAttribute("disabled");
-                    prevBtn.destinationPage = data.previous;
-                } else {
-                    prevBtn.setAttribute("disabled", true);
-                }
-                if (data.next) {
-                    nextBtn.removeAttribute("disabled");
-                    nextBtn.destinationPage = data.next;
-                } else {
-                    nextBtn.setAttribute("disabled", true);
-                }
-            })
-        });
-};
+var monsterDataPromise = new Promise(function(resolve) {
+    var dataFromLocalStorage = JSON.parse(localStorage.getItem('monsters'));
+    if (dataFromLocalStorage) {
+        resolve(dataFromLocalStorage);
+    } else {
+        fetch('https://gist.githubusercontent.com/TazHinkle/9b7374b07a66e725263262e4debbcaa3/raw/431861e93ea55a6db017cd55195ef63d81a529ae/monsters.json')
+            .then(function(response) {
+                response.json().then(function(data) {
+                    console.log('requestData: data', data);
+                    localStorage.setItem('monsters', JSON.stringify(data));
+                    resolve(data);
+                })
+            });
+    }
+});
+monsterDataPromise.then(makeMonsterTable);
 
-requestMonsterList(`https://api.open5e.com/monsters/`);
