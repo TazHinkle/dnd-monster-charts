@@ -1,9 +1,27 @@
-var canvasElement = document.getElementById('myChart');
 var contentHolder = document.getElementById('content-holder');
 var topContent = document.getElementById('top-content');
 var urlParams = {};
 var monsters = [];
 var monstersPerPage = 100;
+var bounds = {};
+var stats = [
+    "strength", 
+    "intelligence", 
+    "wisdom", 
+    "charisma", 
+    "dexterity", 
+    "constitution"
+];
+
+var getPropertyBounds = function(propertyName) {
+    var target = {};
+    bounds[propertyName] = target;
+    monsters.forEach(function(monster) {
+        var currentValue = monster[propertyName];
+        target.min = Math.min(target.min || currentValue, currentValue);
+        target.max = Math.max(target.max || currentValue, currentValue);
+    });
+};
 
 var actUponHashParameters = function(urlString) {
     var hash = urlString.split('#').pop();
@@ -34,13 +52,13 @@ var renderMonsterDetails = function(urlParams) {
     console.log("renderMonsterDetails: monster", monster);
     topContent.innerHTML = `
         <div class="card mt-5">
-            <img
+            <canvas
+                id="chart"
                 class="card-img-top h-100"
                 alt="Card image cap"
                 width="512"
                 height="256"
-                src="http://placegoat.com/512/256"
-            />
+            ></canvas>
             <div class="card-body">
                 <h5 class="card-title">${monster.name}</h5>
                 <p class="card-text">${monster.legendary_desc}</p>
@@ -65,6 +83,62 @@ var renderMonsterDetails = function(urlParams) {
         </div>
     `
     topContent.scrollIntoView(true);
+    var canvasElement = document.getElementById('chart');
+    var data = {
+        datasets: [{
+            barPercentage: 0.5,
+            barThickness: 6,
+            maxBarThickness: 8,
+            minBarLength: 2,
+            data: [10, 20, 30, 40, 50, 60, 70]
+        }]
+    };
+    var options = {};
+    var myBarChart = new Chart(
+        canvasElement.getContext('2d'),
+        {
+            "type": "horizontalBar",
+            "data": {
+                "labels": stats,
+                "datasets": [
+                    {
+                        "label": "Stats",
+                        "data": stats.map(function(statName) {
+                            return monster[statName];
+                        }),
+                        "fill": false,
+                        "backgroundColor": [
+                            "rgba(255, 99, 132, 0.2)",
+                            "rgba(255, 159, 64, 0.2)",
+                            "rgba(255, 205, 86, 0.2)",
+                            "rgba(75, 192, 192, 0.2)",
+                            "rgba(54, 162, 235, 0.2)",
+                            "rgba(153, 102, 255, 0.2)",
+                            "rgba(201, 203, 207, 0.2)"
+                        ],
+                        "borderColor": [
+                            "rgb(255, 99, 132)",
+                            "rgb(255, 159, 64)",
+                            "rgb(255, 205, 86)",
+                            "rgb(75, 192, 192)",
+                            "rgb(54, 162, 235)",
+                            "rgb(153, 102, 255)",
+                            "rgb(201, 203, 207)"
+                        ],
+                        "borderWidth": 1
+                    }]
+            },
+            "options": {
+                "scales": {
+                    "xAxes": [{
+                        "ticks": {
+                            "beginAtZero": true
+                        }
+                    }]
+                }
+            }
+        }
+    );
 }
 
 window.addEventListener("hashchange", function(hashChangeEvent) {
@@ -144,6 +218,7 @@ var monsterDataPromise = new Promise(function(resolve) {
 });
 monsterDataPromise.then(function(data) {
     monsters = data;
+    stats.forEach(getPropertyBounds);
     actUponHashParameters(window.location.href);
 });
 
