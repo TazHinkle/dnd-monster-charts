@@ -132,7 +132,9 @@ var renderMonsterDetails = function(urlParams) {
                 "scales": {
                     "xAxes": [{
                         "ticks": {
-                            "beginAtZero": true
+                            "beginAtZero": true,
+                            "suggestedMin": 30,
+                            "suggestedMax": 30
                         }
                     }]
                 }
