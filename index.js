@@ -59,6 +59,13 @@ var renderMonsterDetails = function(urlParams) {
                 width="512"
                 height="256"
             ></canvas>
+            <canvas
+                id="radar"
+                class="card-img-top h-100"
+                alt="Card image cap"
+                width="512"
+                height="256"
+            ></canvas>
             <div class="card-body">
                 <h5 class="card-title">${monster.name}</h5>
                 <p class="card-text">${monster.legendary_desc}</p>
@@ -84,15 +91,8 @@ var renderMonsterDetails = function(urlParams) {
     `
     topContent.scrollIntoView(true);
     var canvasElement = document.getElementById('chart');
-    var data = {
-        datasets: [{
-            barPercentage: 0.5,
-            barThickness: 6,
-            maxBarThickness: 8,
-            minBarLength: 2,
-            data: [10, 20, 30, 40, 50, 60, 70]
-        }]
-    };
+    var canvasRadarElement = document.getElementById('radar');
+
     var options = {};
     var myBarChart = new Chart(
         canvasElement.getContext('2d'),
@@ -137,6 +137,41 @@ var renderMonsterDetails = function(urlParams) {
                             "suggestedMax": 30
                         }
                     }]
+                }
+            }
+        }
+    );
+    var myRadarChart = new Chart(
+        canvasRadarElement.getContext('2d'),
+        {
+            "type": "radar",
+            "data": {
+                "labels": stats,
+                "datasets": [
+                    {
+                        "label": "Stats",
+                        "data": stats.map(function(statName) {
+                            return monster[statName];
+                        }),
+
+                        "fill": true,
+                        "backgroundColor":"rgba(255, 99, 132, 0.2)",
+                        "borderColor":"rgb(255, 99, 132)",
+                        "pointBackgroundColor":"rgb(255, 99, 132)",
+                        "pointBorderColor":"#fff",
+                        "pointHoverBackgroundColor":"#fff",
+                        "pointHoverBorderColor":"rgb(255, 99, 132)",
+                    }]
+            },
+            "options": {
+                scale: {
+                    angleLines: {
+                        display: false
+                    },
+                    ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 30
+                    }
                 }
             }
         }
