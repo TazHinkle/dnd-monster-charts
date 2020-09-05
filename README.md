@@ -16,5 +16,5 @@
 - Jump to different pages of the monster tables: #page=5
 
 - Sortable List
-    - Event Listeners on the chart headings
     - Sort functions for visible types
+    - Have descending sorting options
