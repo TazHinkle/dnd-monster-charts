@@ -5,11 +5,11 @@ var monsters = [];
 var monstersPerPage = 100;
 var bounds = {};
 var stats = [
-    "strength", 
-    "intelligence", 
-    "wisdom", 
-    "charisma", 
-    "dexterity", 
+    "strength",
+    "intelligence",
+    "wisdom",
+    "charisma",
+    "dexterity",
     "constitution"
 ];
 
@@ -23,26 +23,29 @@ var getPropertyBounds = function(propertyName) {
     });
 };
 
-var actUponHashParameters = function(urlString) {
+var parseUrlHash = function(urlString) {
     var hash = urlString.split('#').pop();
     var params = {};
     hash.slice(1).split("&").forEach(function(item) {
         var split = item.split('=');
         params[split[0]] = split[1];
     });
-    urlParams = params;
-    console.log('window hash change listener', params);
-    if(params.monster) {
-        renderMonsterDetails(params);
+    if(params.page !== undefined) {
+        params.page = parseInt(params.page, 10);
+    };
+    return params;
+};
+
+var actUponHashParameters = function(urlString) {
+    urlParams = parseUrlHash(urlString);
+    console.log('window hash change listener', urlParams);
+    if(urlParams.monster) {
+        renderMonsterDetails(urlParams);
     } else {
         topContent.innerHTML = '';
         topContent.scrollIntoView(true);
     }
-    if(params.page) {
-        makeMonsterTable(monsters, parseInt(params.page, 10));
-    } else {
-        makeMonsterTable(monsters, 0);
-    }
+    makeMonsterTable(monsters, urlParams);
 }
 
 var renderMonsterDetails = function(urlParams) {
@@ -85,7 +88,7 @@ var renderMonsterDetails = function(urlParams) {
                 </li>
             </ul>
             <div class="card-body">
-                <a href="#?page=${urlParams.page || 0}" class="card-link">Close</a>
+                <a href="#?page=${urlParams.page || 0}&sort=${urlParams.sort}" class="card-link">Close</a>
             </div>
         </div>
     `
@@ -182,9 +185,72 @@ window.addEventListener("hashchange", function(hashChangeEvent) {
     actUponHashParameters(hashChangeEvent.newURL);
 });
 
-var makeMonsterTable = function(monsters, page) {
-    console.log('makeMonsterTable : page', page);
-    var monstersOnThisPage = monsters.slice(
+var sanitizeFraction = function(string) {
+    var result = parseInt(string, 10);
+    if(string.indexOf('/') > -1) {
+        var split = string.split('/');
+        var a = parseInt(split[0], 10);
+        var b = parseInt(split[1], 10);
+        result = a / b;
+    }
+    return result;
+}
+
+var sortNumericallyWithFractions = function(property) {
+    return function(a, b) {
+        var fractionA = sanitizeFraction(a[property]) || 0;
+        var fractionB = sanitizeFraction(b[property]) || 0;
+        return fractionA - fractionB;
+    };
+};
+
+var sortAlphabetically = function(property) {
+    return function(a, b) {
+        var nameA = a[property].toLocaleLowerCase();
+        var nameB = b[property].toLocaleLowerCase();
+        return nameA.localeCompare(nameB);
+    };
+};
+
+var sizeMap = {
+    tiny: 0,
+    small: 1,
+    medium: 2,
+    large: 3,
+    huge: 4,
+    gargantuan: 5
+};
+var sortBySize = function(a, b) {
+    var sizeA = sizeMap[a.size.toLocaleLowerCase()] || 0;
+    var sizeB = sizeMap[b.size.toLocaleLowerCase()] || 0;
+    return sizeA - sizeB;
+};
+
+var sortMethods = {
+    name: sortAlphabetically('name'),
+    type: sortAlphabetically('type'),
+    size: sortBySize,
+    challenge_rating: sortNumericallyWithFractions('challenge_rating')
+};
+
+var sortMonsters = function(monsters, sort) {
+    var sortMethod = sortMethods[sort];
+    monsters.sort(sortMethod);
+}
+
+var makeMonsterTable = function(monsters, urlParams) {
+    var page = urlParams.page || 0;
+    var sort = urlParams.sort || 'name';
+    var sortedMonsters = monsters.slice();
+    console.log(
+        'makeMonsterTable: args',
+        {
+            page:page,
+            sort:sort
+        }
+    );
+    sortMonsters(sortedMonsters, sort);
+    var monstersOnThisPage = sortedMonsters.slice(
         monstersPerPage * page,
         monstersPerPage * (page + 1)
     );
@@ -194,7 +260,7 @@ var makeMonsterTable = function(monsters, page) {
         var active = i === page ? ' active' : '';
         pageLinks.push(`
             <li class="page-item${active}">
-                <a class="page-link" href="#?page=${i}">${i + 1}</a>
+                <a class="page-link" href="#?page=${i}&sort=${sort}">${i + 1}</a>
             </li>
         `);
     }
@@ -202,7 +268,7 @@ var makeMonsterTable = function(monsters, page) {
         return `
             <tr>
                 <th scope="row">
-                    <a href="#?page=${page}&monster=${monster.slug}">${monster.name}</a>
+                    <a href="#?page=${page}&sort=${sort}&monster=${monster.slug}">${monster.name}</a>
                 </th>
                 <td>${monster.type}</td>
                 <td>${monster.size}</td>
@@ -225,10 +291,18 @@ var makeMonsterTable = function(monsters, page) {
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Size</th>
-                    <th scope="col">Challenge Rating</th>
+                    <th scope="col">
+                        <a href="#?sort=name">Name</a>
+                    </th>
+                    <th scope="col">
+                        <a href="#?sort=type">Type</a>
+                    </th>
+                    <th scope="col">
+                        <a href="#?sort=size">Size</a>
+                    </th>
+                    <th scope="col">
+                        <a href="#?sort=challenge_rating">Challenge Rating</a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -258,4 +332,3 @@ monsterDataPromise.then(function(data) {
     stats.forEach(getPropertyBounds);
     actUponHashParameters(window.location.href);
 });
-
