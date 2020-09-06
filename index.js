@@ -62,21 +62,29 @@ var renderMonsterDetails = function(urlParams) {
                 width="512"
                 height="256"
             ></canvas>
-            <canvas
-                id="radar"
-                class="card-img-top h-100"
-                alt="Card image cap"
-                width="512"
-                height="256"
-            ></canvas>
             <div class="card-body">
                 <h5 class="card-title">${monster.name}</h5>
                 <p class="card-text">${monster.legendary_desc}</p>
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>Type:</strong>
-                    <span>${monster.type}</span>
+                    <strong>Armor Class: </strong>
+                    <span>${monster.armor_class}</span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Languages:</strong>
+                    <span>${monster.languages}</span>
+                </li><li class="list-group-item">
+                    <strong>Senses:</strong>
+                    <span>${monster.senses}</span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Speed (walking, flying, swimming):</strong>
+                    <span>
+                        ${monster.speed.walk || 0},
+                        ${monster.speed.fly || 0}, 
+                        ${monster.speed.swim || 0}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Size:</strong>
@@ -94,8 +102,6 @@ var renderMonsterDetails = function(urlParams) {
     `
     topContent.scrollIntoView(true);
     var canvasElement = document.getElementById('chart');
-    var canvasRadarElement = document.getElementById('radar');
-
     var options = {};
     var myBarChart = new Chart(
         canvasElement.getContext('2d'),
@@ -140,41 +146,6 @@ var renderMonsterDetails = function(urlParams) {
                             "suggestedMax": 30
                         }
                     }]
-                }
-            }
-        }
-    );
-    var myRadarChart = new Chart(
-        canvasRadarElement.getContext('2d'),
-        {
-            "type": "radar",
-            "data": {
-                "labels": stats,
-                "datasets": [
-                    {
-                        "label": "Stats",
-                        "data": stats.map(function(statName) {
-                            return monster[statName];
-                        }),
-
-                        "fill": true,
-                        "backgroundColor":"rgba(255, 99, 132, 0.2)",
-                        "borderColor":"rgb(255, 99, 132)",
-                        "pointBackgroundColor":"rgb(255, 99, 132)",
-                        "pointBorderColor":"#fff",
-                        "pointHoverBackgroundColor":"#fff",
-                        "pointHoverBorderColor":"rgb(255, 99, 132)",
-                    }]
-            },
-            "options": {
-                scale: {
-                    angleLines: {
-                        display: false
-                    },
-                    ticks: {
-                        suggestedMin: 0,
-                        suggestedMax: 30
-                    }
                 }
             }
         }
