@@ -82,7 +82,7 @@ var renderMonsterDetails = function(urlParams) {
                     <strong>Speed (walking, flying, swimming):</strong>
                     <span>
                         ${monster.speed.walk || 0},
-                        ${monster.speed.fly || 0}, 
+                        ${monster.speed.fly || 0},
                         ${monster.speed.swim || 0}
                     </span>
                 </li>
@@ -294,39 +294,75 @@ var makeMonsterTable = function(monsters, urlParams) {
                 <tr>
                     <th scope="col">
                         Name
-                        <a href="#?sort=name-asc">
-                            <button type="button" class="btn btn-info" style="margin-left:50px;">↓</button>
-                        </a>
-                        <a href="#?sort=name-desc">
-                            <button type="button" class="btn btn-info">↑</button>
-                        </a>
+                        <a
+                            href="#?sort=name-asc"
+                            class="
+                                btn
+                                btn-info
+                                ml-5
+                            "
+                        >↓</a>
+                        <a
+                            href="#?sort=name-desc"
+                            class="
+                                btn
+                                btn-info
+                            "
+                        >↑</a>
                     </th>
                     <th scope="col">
                         Type
-                        <a href="#?sort=type-asc">
-                        <button type="button" class="btn btn-info" style="margin-left:20px;">↓</button>
-                        </a>
-                        <a href="#?sort=type-desc">
-                        <button type="button" class="btn btn-info">↑</button>
-                        </a>
+                        <a 
+                            href="#?sort=type-asc"
+                            class="
+                                btn
+                                btn-info
+                                ml-3
+                            "
+                        >↓</a>
+                        <a 
+                            href="#?sort=type-desc"
+                            class="
+                                btn
+                                btn-info
+                            "
+                        >↑</a>
                     </th>
                     <th scope="col">
                         Size
-                        <a href="#?sort=size-asc">
-                            <button type="button" class="btn btn-info" style="margin-left:20px;">↓</button>
-                        </a>
-                        <a href="#?sort=size-desc">
-                            <button type="button" class="btn btn-info">↑</button>
-                        </a>
+                        <a 
+                            href="#?sort=size-asc"
+                            class="
+                                btn
+                                btn-info
+                                ml-3
+                            "
+                        >↓</a>
+                        <a 
+                            href="#?sort=size-desc"
+                            class="
+                                btn
+                                btn-info
+                            "
+                        >↑</a>
                     </th>
                     <th scope="col">
-                    Challenge Rating
-                        <a href="#?sort=challenge_rating-asc">
-                        <button type="button" class="btn btn-info" style="margin-left:10px;">↓</button>
-                        </a>
-                        <a href="#?sort=challenge_rating-desc">
-                            <button type="button" class="btn btn-info">↑</button>
-                        </a>
+                        Challenge Rating
+                        <a 
+                            href="#?sort=challenge_rating-asc"
+                            class="
+                                btn
+                                btn-info
+                                ml-3
+                            "
+                        >↓</a>
+                        <a 
+                            href="#?sort=challenge_rating-desc"
+                            class="
+                                btn
+                                btn-info
+                            "
+                        >↑</a>
                     </th>
                 </tr>
             </thead>
