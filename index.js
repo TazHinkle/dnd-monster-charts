@@ -167,35 +167,41 @@ var sanitizeFraction = function(string) {
     return result;
 }
 
-var sortNumericallyWithFractions = function(property) {
+var numericAscending = function(a, b) {
+    return a - b;
+}
+
+var numericDescending = function(a, b) {
+    return b - a;
+}
+
+var alphabeticAscending = function(a, b) {
+    return a.localeCompare(b);
+}
+
+var alphabeticDescending = function(a, b) {
+    return b.localeCompare(a);
+}
+
+var sortNumericallyWithFractions = function(property, direction) {
+    var sortDirection = direction === 'desc'
+        ? numericDescending
+        : numericAscending;
     return function(a, b) {
         var fractionA = sanitizeFraction(a[property]) || 0;
         var fractionB = sanitizeFraction(b[property]) || 0;
-        return fractionA - fractionB;
+        return sortDirection(fractionA, fractionB);
     };
 };
 
-var sortNumericallyWithFractionsDescending = function(property) {
-    return function(a, b) {
-        var fractionA = sanitizeFraction(a[property]) || 0;
-        var fractionB = sanitizeFraction(b[property]) || 0;
-        return fractionB - fractionA;
-    };
-};
-
-var sortAlphabetically = function(property) {
+var sortAlphabetically = function(property, direction) {
+    var sortDirection = direction === 'desc'
+        ? alphabeticDescending
+        : alphabeticAscending;
     return function(a, b) {
         var nameA = a[property].toLocaleLowerCase();
         var nameB = b[property].toLocaleLowerCase();
-        return nameA.localeCompare(nameB);
-    };
-};
-
-var sortAlphabeticallyDescending = function(property) {
-    return function(a, b) {
-        var nameA = a[property].toLocaleLowerCase();
-        var nameB = b[property].toLocaleLowerCase();
-        return nameB.localeCompare(nameA);
+        return sortDirection(nameA, nameB);
     };
 };
 
@@ -207,31 +213,29 @@ var sizeMap = {
     huge: 4,
     gargantuan: 5
 };
-var sortBySize = function(a, b) {
-    var sizeA = sizeMap[a.size.toLocaleLowerCase()] || 0;
-    var sizeB = sizeMap[b.size.toLocaleLowerCase()] || 0;
-    return sizeA - sizeB;
-};
-
-var sortBySizeDescending = function(a, b) {
-    var sizeA = sizeMap[a.size.toLocaleLowerCase()] || 0;
-    var sizeB = sizeMap[b.size.toLocaleLowerCase()] || 0;
-    return sizeB - sizeA;
+var sortBySize = function(property, direction) {
+    var sortDirection = direction === 'desc'
+        ? numericDescending
+        : numericAscending;
+    return function(a, b) {
+        var sizeA = sizeMap[a[property].toLocaleLowerCase()] || 0;
+        var sizeB = sizeMap[b[property].toLocaleLowerCase()] || 0;
+        return sortDirection(sizeA, sizeB);
+    };
 };
 
 var sortMethods = {
-    name_asc: sortAlphabetically('name'),
-    name_desc: sortAlphabeticallyDescending('name'),
-    type_asc: sortAlphabetically('type'),
-    type_desc: sortAlphabeticallyDescending('type'),
-    size_asc: sortBySize,
-    size_desc: sortBySizeDescending,
-    challenge_rating_asc: sortNumericallyWithFractions('challenge_rating'),
-    challenge_rating_desc: sortNumericallyWithFractionsDescending('challenge_rating')
+    name: sortAlphabetically,
+    type: sortAlphabetically,
+    size: sortBySize,
+    challenge_rating: sortNumericallyWithFractions
 };
 
 var sortMonsters = function(monsters, sort) {
-    var sortMethod = sortMethods[sort];
+    var sortSplit = sort.split('-')
+    var property = sortSplit[0];
+    var direction = sortSplit[1];
+    var sortMethod = sortMethods[property](property, direction);
     monsters.sort(sortMethod);
 }
 
@@ -290,37 +294,37 @@ var makeMonsterTable = function(monsters, urlParams) {
                 <tr>
                     <th scope="col">
                         Name
-                        <a href="#?sort=name_asc">
+                        <a href="#?sort=name-asc">
                             <button type="button" class="btn btn-info" style="margin-left:50px;">↓</button>
                         </a>
-                        <a href="#?sort=name_desc">
+                        <a href="#?sort=name-desc">
                             <button type="button" class="btn btn-info">↑</button>
                         </a>
                     </th>
                     <th scope="col">
                         Type
-                        <a href="#?sort=type_asc">
+                        <a href="#?sort=type-asc">
                         <button type="button" class="btn btn-info" style="margin-left:20px;">↓</button>
                         </a>
-                        <a href="#?sort=type_desc">
+                        <a href="#?sort=type-desc">
                         <button type="button" class="btn btn-info">↑</button>
                         </a>
                     </th>
                     <th scope="col">
                         Size
-                        <a href="#?sort=size_asc">
+                        <a href="#?sort=size-asc">
                             <button type="button" class="btn btn-info" style="margin-left:20px;">↓</button>
                         </a>
-                        <a href="#?sort=size_desc">
+                        <a href="#?sort=size-desc">
                             <button type="button" class="btn btn-info">↑</button>
                         </a>
                     </th>
                     <th scope="col">
                     Challenge Rating
-                        <a href="#?sort=challenge_rating_asc">
+                        <a href="#?sort=challenge_rating-asc">
                         <button type="button" class="btn btn-info" style="margin-left:10px;">↓</button>
                         </a>
-                        <a href="#?sort=challenge_rating_desc">
+                        <a href="#?sort=challenge_rating-desc">
                             <button type="button" class="btn btn-info">↑</button>
                         </a>
                     </th>
