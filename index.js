@@ -32,7 +32,7 @@ var parseUrlHash = function(urlString) {
     });
     if(params.page !== undefined) {
         params.page = parseInt(params.page, 10);
-    };
+    }
     return params;
 };
 
@@ -54,16 +54,15 @@ var renderMonsterDetails = function(urlParams) {
     });
     console.log("renderMonsterDetails: monster", monster);
     topContent.innerHTML = `
-        <div class="card mt-5">
+        <div class="card mb-3">
+            <div class="card-header">${monster.name}</div>
             <canvas
                 id="chart"
                 class="card-img-top h-100"
-                alt="Card image cap"
                 width="512"
                 height="256"
             ></canvas>
             <div class="card-body">
-                <h5 class="card-title">${monster.name}</h5>
                 <p class="card-text">${monster.legendary_desc}</p>
             </div>
             <ul class="list-group list-group-flush">
@@ -239,6 +238,34 @@ var sortMonsters = function(monsters, sort) {
     monsters.sort(sortMethod);
 }
 
+var makeMonsterTableColumnHeader = function(label, fieldName) {
+    return `
+        <th scope="col">
+            <span 
+                class="d-block"
+            >${label}</span>
+            <span 
+                class="d-block"
+            >
+                <a
+                    href="#?sort=${fieldName}-asc"
+                    class="
+                        btn
+                        btn-info
+                    "
+                >↓</a>
+                <a
+                    href="#?sort=${fieldName}-desc"
+                    class="
+                        btn
+                        btn-info
+                    "
+                >↑</a>
+            </span>
+        </th>
+    `
+}
+
 var makeMonsterTable = function(monsters, urlParams) {
     var page = urlParams.page || 0;
     var sort = urlParams.sort || 'name';
@@ -259,9 +286,15 @@ var makeMonsterTable = function(monsters, urlParams) {
     var pageLinks = [];
     for(var i = 0; i < numberOfPages; i++) {
         var active = i === page ? ' active' : '';
+        var fitsMobileView = (Math.abs(page - i) < 3) ? '' : ' d-none d-sm-inline';
         pageLinks.push(`
-            <li class="page-item${active}">
-                <a class="page-link" href="#?page=${i}&sort=${sort}">${i + 1}</a>
+            <li 
+                class="page-item${active}${fitsMobileView}"
+            >
+                <a 
+                    class="page-link" 
+                    href="#?page=${i}&sort=${sort}"
+                >${i + 1}</a>
             </li>
         `);
     }
@@ -292,78 +325,10 @@ var makeMonsterTable = function(monsters, urlParams) {
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th scope="col">
-                        Name
-                        <a
-                            href="#?sort=name-asc"
-                            class="
-                                btn
-                                btn-info
-                                ml-5
-                            "
-                        >↓</a>
-                        <a
-                            href="#?sort=name-desc"
-                            class="
-                                btn
-                                btn-info
-                            "
-                        >↑</a>
-                    </th>
-                    <th scope="col">
-                        Type
-                        <a 
-                            href="#?sort=type-asc"
-                            class="
-                                btn
-                                btn-info
-                                ml-3
-                            "
-                        >↓</a>
-                        <a 
-                            href="#?sort=type-desc"
-                            class="
-                                btn
-                                btn-info
-                            "
-                        >↑</a>
-                    </th>
-                    <th scope="col">
-                        Size
-                        <a 
-                            href="#?sort=size-asc"
-                            class="
-                                btn
-                                btn-info
-                                ml-3
-                            "
-                        >↓</a>
-                        <a 
-                            href="#?sort=size-desc"
-                            class="
-                                btn
-                                btn-info
-                            "
-                        >↑</a>
-                    </th>
-                    <th scope="col">
-                        Challenge Rating
-                        <a 
-                            href="#?sort=challenge_rating-asc"
-                            class="
-                                btn
-                                btn-info
-                                ml-3
-                            "
-                        >↓</a>
-                        <a 
-                            href="#?sort=challenge_rating-desc"
-                            class="
-                                btn
-                                btn-info
-                            "
-                        >↑</a>
-                    </th>
+                    ${makeMonsterTableColumnHeader('Name', 'name')}
+                    ${makeMonsterTableColumnHeader('Type', 'type')}
+                    ${makeMonsterTableColumnHeader('Size', 'size')}
+                    ${makeMonsterTableColumnHeader('Challenge Rating', 'challenge_rating')}
                 </tr>
             </thead>
             <tbody>

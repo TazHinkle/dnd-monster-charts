@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monsterous Data</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css">
+	<style>
+		#content-holder .table td {
+			word-break: break-word;
+		}
+	</style>
 </head>
 <body>
     <div class="container">
         <h1>Monsterous Data</h1>
-        <div id="top-content"></div>
-        <div class="card mt-5">
-            <div class="card-body">
-                <div id="content-holder">
-                    <h2>loading</h2>
-                </div>
-            </div>
-        </div>
+        <div id="top-content" class="pt-3"></div>
+		<div id="content-holder">
+			<h2>loading</h2>
+		</div>
     </div>
-    <canvas id="myChart" width="400" height="400"></canvas>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
     <script src="index.js"></script>
 </body>
